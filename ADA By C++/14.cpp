@@ -33,16 +33,25 @@ void Discomfort (vector <long long> &sleep, vector <vector <long long> > &discom
     return;
 }
 
-void MinDiscomfort (vector <vector <long long> > &discomfortValue, vector <vector <long long> > &Nightmares, vector <vector <int> > &Check, int Cut, int N, int start){
+void MinDiscomfort (vector <vector <long long> > &discomfortValue, vector <vector <long long> > &Nightmares, vector <vector <int> > &Check, int Cut, int N, int end, int K){
     if (Cut == 0) return;
-    for (int i = start; i < N - 1 - Cut; ++i){
-        int length = (i - 0) + 1;
-        if (Check[Cut - 1][i + 1] == 0){
-            MinDiscomfort (discomfortValue, Nightmares, Check, Cut - 1, N, i + 1);
+    long long minValue = INT64_MAX;
+    for (int i = end - 1; i > Cut - 1 - 1; --i){
+        int length = end - i;
+        if (Check[Cut - 1][i] == 0){
+            MinDiscomfort (discomfortValue, Nightmares, Check, Cut - 1, N, i, K);
         }
-        Nightmares[Cut][i] =  discomfortValue[start][i] * length + Nightmares[Cut - 1][i + 1];
-        Check[Cut][i] = 1;
+        long long curMin = discomfortValue[i + 1][end] * length + Nightmares[Cut - 1][i];
+        if (curMin < minValue) minValue = curMin;
     }
+    Nightmares[Cut][end] =  minValue;
+    Check[Cut][end] = 1;
+    /*for (int i = 0; i < K; ++i){
+        for (int j = 0; j < N; ++j){
+            cout << Nightmares[i][j] << ' ';
+        }
+        cout << '\n';
+    } cout << '\n';*/
     return;
 }
 //
@@ -63,10 +72,16 @@ int main(){
         discomfortValue.push_back(vec);
     }
     Discomfort (sleep, discomfortValue, N);
+    /*for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N ; ++j) {
+            cout << discomfortValue[i][j] << ' ';
+        }
+        cout << '\n';
+    }cout << '\n';*/
     vector <vector <long long> > Nightmares;
     for (int i = 0; i < K; ++i) {
         vector<long long> vec;
-        for (int j = 0; j < N - 1; ++j) {
+        for (int j = 0; j < N; ++j) {
             vec.push_back(0);
         }
         Nightmares.push_back(vec);
@@ -74,27 +89,23 @@ int main(){
     vector <vector <int> > Check;
     for (int i = 0; i < K; ++i) {
         vector<int> vec;
-        for (int j = 0; j < N - 1; ++j) {
+        for (int j = 0; j < N; ++j) {
             vec.push_back(0);
         }
         Check.push_back(vec);
     }
-    for (int j = 0; j < N - 1; ++j) {
+    for (int j = 0; j < N; ++j) {
         Check[0][j] = 1;
-        int length = ((N - 1) - j) + 1;
-        Nightmares[0][j] = discomfortValue[j][N - 1] * length;
+        int length = (j - 0) + 1;
+        Nightmares[0][j] = discomfortValue[0][j] * length;
     }
-    MinDiscomfort (discomfortValue, Nightmares, Check, K - 1, N, 0);
-    long long ans = INT64_MAX;
-    for (int i = 0; i < N - 1 - (K - 1); ++i){
-        if (Nightmares[K - 1][i] < ans) ans = Nightmares[K - 1][i];
-    }
-    //cout << ans;
-    for (int i = 0; i < K; ++i){
-        for (int j = 0; j < N - 1; ++j){
+    MinDiscomfort (discomfortValue, Nightmares, Check, K - 1, N, N - 1, K);
+    cout << Nightmares[K - 1][N - 1];
+    /*for (int i = 0; i < K; ++i){
+        for (int j = 0; j < N; ++j){
             cout << Nightmares[i][j] << ' ';
         }
         cout << '\n';
-    } 
+    }*/
     return 0;
 }
