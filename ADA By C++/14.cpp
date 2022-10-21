@@ -7,29 +7,17 @@ vector <vector <long long> > discomfortValue;
 vector <vector <long long> > Nightmares; //Init Nightmares
 vector <vector <int> > Check; //Init Check
 
-void Discomfort (vector <long long> &sleep, int N){
-    vector <vector <int> > maxToEnd;
-    for (int i = 0; i < N; ++i) {
-        vector<int> vec;
-        for (int j = 0; j < N ; ++j) {
-            vec.push_back(0);
-        }
-        maxToEnd.push_back(vec);
-    }
+void Discomfort (vector <long long> &sleep, int N){ 
     for (int i = 0; i < N; ++i){
         discomfortValue[i][i] = sleep[i];
-        maxToEnd[i][i] = sleep[i];
     }
     for (int i = 0; i < N; ++i){
+        long long current = discomfortValue[i][i];
         for (int j = i + 1; j < N; ++j){
-            long long combineSum = maxToEnd[i][j - 1] + sleep[j];
-            discomfortValue[i][j] = max (combineSum, max (discomfortValue[i][j - 1], sleep[j]));
-            if (discomfortValue[i][j] == sleep[j]){
-                maxToEnd[i][j] = sleep[j];
-            }
-            else {
-                maxToEnd[i][j] = combineSum;
-            }
+            current += sleep[j];
+            if (current < 0 || sleep[j] > current) current = sleep[j];
+            discomfortValue[i][j] = discomfortValue[i][j - 1];
+            if (discomfortValue[i][j] < current) discomfortValue[i][j] = current;
         }
     }
     return;
@@ -46,15 +34,15 @@ long long MinDiscomfort (int Cut, int end, int N, int K){
         long long curMin = discomfortValue[i][end] * length + Nightmares[Cut - 1][i - 1];
         if (curMin < minValue) minValue = curMin;
     }
-    for (int i = 0; i < K; ++i){
+    /*for (int i = 0; i < K; ++i){
         for (int j = 0; j < N; ++j){
             cout << Nightmares[i][j] << ' ';
         }
         cout << '\n';
-    }
+    }*/
     return minValue;
 }
-//
+
 int main(){
     int N {}, K {};
     cin >> N >> K;
@@ -97,12 +85,12 @@ int main(){
         Nightmares[0][j] = discomfortValue[0][j] * length;
     }
     Nightmares[K - 1][N - 1] = MinDiscomfort (K - 1, N - 1, N, K); //Recusion
-    for (int i = 0; i < K; ++i){
+    /*for (int i = 0; i < K; ++i){
         for (int j = 0; j < N; ++j){
             cout << Nightmares[i][j] << ' ';
         }
         cout << '\n';
-    }
+    }*/
     cout << Nightmares[K - 1][N - 1]; //Answer
     return 0;
 }
