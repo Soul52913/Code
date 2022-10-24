@@ -57,3 +57,65 @@ i from 1 to 9<br>
 ### (e)
 ### (f)
 ## 6
+### (a)
+### Algorithm
+V[ ] stores the velocity of participants, from 1 to N.<br> 
+d[ ] stores the difference<br>
+ans[ ] stores every i groups min total difference
+1. Sort all the participants by their velocity in ascending order
+2. Use a for loop to calculate the difference of V[i] and V[i + 1], i from 1 to N - 1, and store them in d[i].
+3. Sort the d[ ] from 1 to N - 1 in descending order, and let d[0] = 0
+4. Calculate the velocity difference between V.head and V.tail and store it in the variable minTotalDiff
+5. Use a for loop, i from 1 to N. In each loop, minTotalDiff -= d[i - 1]. Store minTotalDiff in ans[i]
+### Correctness
+- If we have one group, we have $min_1$ and $max_1$. Total difference is $max_1 - min_1$ 
+- If we have two groups, it means that we cut the one groups into two groups
+- On the left side of the cut place, we have the max number of the left group, called $max_2$
+- On the right side of the cut place, we have the min number of the right group, called $min_2$
+- Total difference is $(max_1 - min_2)+(max_2 - min_1) = (max_1 - min_1)-(min_2-max_2)$
+- If we can get max difference between two adjacent numbers, we can get min total difference of two groups
+- If we have three groups, let min total difference of two groups minus the less max difference between two adjacent numbers. Then, we get min total difference of 3 groups
+- If we have i groups, let min total difference of i - 1 groups minus the least i-th max difference between two adjacent numbers. Then, we get min total difference of i groups    
+<br>Thus, by the algorithm we can get all difference between two adjacent numbers in descending order. Then, we can get min total difference of all i groups
+### Time Complexity
+1. Sort all the participants by their velocity in ascending order : O(NlogN)
+2. Use a for loop to calculate the difference of V[i] and V[i + 1], i from 1 to N - 1, and store them in d[i] : O(N)
+3. Sort the d[ ] from 1 to N - 1 in descending order, and let d[0] = 0 : O(NlogN)
+4. Calculate the velocity difference between V.head and V.tail and store it in the variable minTotalDiff : O(1)
+5. Use a for loop, i from 1 to N. In each loop, minTotalDiff -= d[i - 1]. Store minTotalDiff in ans[i] : O(N)
+- Total :
+$$O(NlogN) + O(N) + O(NlogN) + O(1) + O(NlogN) = O(NlogN)$$
+
+### (b)
+
+### (c)
+{ {1, 2, 3, 4} }<br>
+{ {1}, {2}, {3}, {4} }<br>
+{ {1, 2}, {3, 4} }<br>
+{ {1, 2}, {3}, {4} }<br>
+{ {1}, {2}, {3, 4} }<br>
+{ {1, 3}, {2, 4} }<br>
+{ {1, 3}, {2}, {4} }<br>
+{ {1}, {3}, {2, 4} }<br>
+{ {1, 4}, {2, 3} }<br>
+{ {1, 4}, {2}, {3} }<br>
+{ {1}, {4}, {2, 3} }<br>
+{ {2, 3, 4}, 1} }<br>
+{ {1, 3, 4}, 2} }<br>
+{ {1, 2, 4}, 3} }<br>
+{ {1, 2, 3}, 4} }<br>
+15 Groups
+
+### (d)
+
+### (e)
+{ {1}, {2}, {3}, {5} }<br>
+{ {1, 2}, {3, 5} }<br>
+{ {1, 2}, {3}, {5} }<br>
+{ {1}, {2}, {3, 5} }<br>
+{ {1, 3}, {2}, {5} }<br>
+{ {1}, {3}, {2, 5} }<br>
+{ {1}, {5}, {2, 3} }<br>
+{ {2, 3, 5}, {1} }<br>
+{ {1, 2, 3}, {5} }<br>
+9 Groups
