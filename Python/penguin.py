@@ -10,6 +10,7 @@ def checkAndSendFavorability(data, id):
             localtime = time.localtime(time.time())
             if (i["favorability"] >= 100):
                 print("跟你回家")
+<<<<<<< HEAD
             elif (i["favorability"] >= 80):
                 print("抱抱")
             elif (i["favorability"] >= 50):
@@ -42,13 +43,43 @@ def checkAndSendFavorability(data, id):
                     if (checkday == 1):
                         print("{}過期了! 請拿出來丟掉!".format(j["foodId"]))
             break
+=======
+            elif (i["favorability"] >= 50):
+                print("抱你")
+            elif (i["favorability"] >= 30):
+                print("握手")
+            elif (i["favorability"] >= 20):
+                print("說你好棒")
+            elif (i["favorability"] >= 10):
+                print("打招呼")
+            elif (i["favorability"] < 0):
+                print("不理你")
+            elif (i["favorability"] < -30):
+                print("打你")
+            elif (i["favorability"] < -50):
+                print("大聲譴責你")
+            for j in i["food"]:
+                checkday = 0
+                if (j["dueDate"][0] < localtime.tm_year):
+                    checkday = 1
+                elif (j["dueDate"][0] == localtime.tm_year):
+                    if (j["dueDate"][1] < localtime.tm_mon):
+                        checkday = 1
+                    elif (j["dueDate"][1] == localtime.tm_mon):
+                        if (j["dueDate"][2] <= localtime.tm_mday):
+                            checkday = 1
+                if (checkday == 1):
+                    print("{}過期了! 請拿出來丟掉!".format(j["foodId"]))
+        break
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
     if (find == 0):
-        food = []
+        food = [{}]
         new = {"id": id, "favorability": 0, "food": food}
         data.append(new)
     return data
 
 def saveFood(data, id, foodid, dueDate):
+<<<<<<< HEAD
     dueyear = dueDate[0] + dueDate[1] + dueDate[2] + dueDate[3]
     duemonth = dueDate[5]  + dueDate[6]
     dueday = dueDate[8]  + dueDate[9]
@@ -72,12 +103,36 @@ def saveFood(data, id, foodid, dueDate):
                     i["food"].append(temp)
                     print("存好了!")
                 break
+=======
+    dueyear = dueDate[0] * 1000 + dueDate[1] * 100 + dueDate[2] * 10 + dueDate[3]
+    duemonth = dueDate[5] * 10 + dueDate[6]
+    dueday = dueDate[8] * 10 + dueDate[9]
+    for i in data:
+        if (i["id"] == id):
+            localtime = time.localtime(time.time())
+            checkday = 0
+            if (dueyear < localtime.tm_year):
+                checkday = 1
+            elif (dueyear == localtime.tm_year):
+                if (duemonth < localtime.tm_mon):
+                    checkday = 1
+                elif (duemonth == localtime.tm_mon):
+                    if (dueday <= localtime.tm_mday):
+                        checkday = 1
+            if (checkday == 1):
+                print("{}過期了!".format(j["foodId"]))
+            else:
+                temp = {"foodId": foodid, "dueDate": [dueyear, duemonth, dueday]}
+                i["food"].append(temp)
+        break
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
     return data
 
 def takeFood(data, id, foodid):
     checkrm = 0
     for i in data:
         if (i["id"] == id):
+<<<<<<< HEAD
             if (len(i["food"]) != 0):
                 for j in i["food"]:
                     if (j["foodId"] == foodid):
@@ -89,12 +144,23 @@ def takeFood(data, id, foodid):
         print("不存在這個食物")
     else:
         print("Dozo")
+=======
+            for j in i["food"]:
+                if (j["foodid"] == foodid):
+                    i["food"].remove(j)
+                    checkrm = 1
+                break
+        break
+    if (checkrm == 0):
+        print("不存在這個食物")
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
     return data
 
 def cleanFridge(data, id):
     checkrm = 0
     for i in data:
         localtime = time.localtime(time.time())
+<<<<<<< HEAD
         if (len(i["food"]) != 0):
             for j in list(i["food"]):
                 checkday = 0
@@ -113,15 +179,37 @@ def cleanFridge(data, id):
                     checkrm = 1
                     if (i["id"] == id):
                         checkrm = 2
+=======
+        for j in i["food"]:
+            checkday = 0
+            if (j["dueDate"][0] < localtime.tm_year):
+                checkday = 1
+            elif (j["dueDate"][0] == localtime.tm_year):
+                if (j["dueDate"][1] < localtime.tm_mon):
+                    checkday = 1
+                elif (j["dueDate"][1] == localtime.tm_mon):
+                    if (j["dueDate"][2] <= localtime.tm_mday):
+                        checkday = 1
+            if (checkday == 1):
+                i["food"].remove(j)
+                i["favorability"] -= 1
+                checkrm = 1
+        if (i["id"] == id):
+            checkrm = 0
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
     if (checkrm == 1):
         for i in data:
             if (i["id"] == id):
                 i["favorability"] += 1
+<<<<<<< HEAD
                 print("謝謝你,好感度加一")
     elif(checkrm == 2):
         print("這是你應該做的!")
     else:
         print("沒東西可以清")
+=======
+                print("謝謝你")
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
     return data
 
 id = input("請輸入您的學號:")
@@ -134,6 +222,7 @@ else:
     else:
         id = id.lower()
         for i in range(1, len(id)):
+<<<<<<< HEAD
             if (id[i] < '0' or id[i] > '9'):
                 check = 1
 if (check == 0):
@@ -142,6 +231,18 @@ if (check == 0):
     data = checkAndSendFavorability(data, id)
     op = input("您想做什麼? (存食物(1) /拿食物(2) /清冰箱(3) /查詢好感度(4) ):")
     op = int(op)
+=======
+            print(id[i])
+            if (id[i] < '0' or id[i] > '9'):
+                check = 1
+if (check == 0):
+    with open(r"C:\Users\bingy\OneDrive\Desktop\Coding\python\haremSystem.json") as f:
+        data = json.load(f)
+    data = checkAndSendFavorability(data, id)
+    op = input("您想做什麼? (存食物(1) /拿食物(2) /清冰箱(3) ):")
+    op = int(op)
+    print(op)
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
     if (op == 1):
         foodid = input("您想存什麼")
         dueDate = input("什麼時候到期(YYYY/MM/DD)")
@@ -151,6 +252,7 @@ if (check == 0):
         takeFood(data, id, foodid)
     elif (op == 3):
         cleanFridge(data, id)
+<<<<<<< HEAD
     elif (op == 4):
         for i in data:
             if (i["id"] == id):
@@ -158,6 +260,11 @@ if (check == 0):
     else:
         print("沒有此項服務")
     with open(r'C:\Users\habor\Desktop\Code\Code\Python\haremSystem.json', 'w') as f:
+=======
+    else:
+        print("沒有此項服務")
+    with open(r"C:\Users\bingy\OneDrive\Desktop\Coding\python\haremSystem.json") as f:
+>>>>>>> bcbde000880b2fe554f550fcd59fb718a0c352da
         json.dump(data, f)
     f.close()
     print("掰掰")
