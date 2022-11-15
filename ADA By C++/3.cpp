@@ -66,5 +66,6 @@ int main() {
     //for (int i = 0; i < N / 5; ++i) if(root->right) root = leftRotate (root);
     coding(root, "");
     for(int i = 0; i < N; ++i) cout << print[i]->code << endl;
+    if (N == 1) cout << 0;
     return 0;
 }
