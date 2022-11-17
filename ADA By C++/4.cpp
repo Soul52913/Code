@@ -1,32 +1,37 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stack>
 
 using namespace std;
-vector <vector <int>>A, B;
-vector <long long> seq;
-vector <int> processed;
-vector <bool> traversed;
 
+struct Point {
+  vector <int> A;
+  vector <int> revA;
+};
+
+stack <int> S;
+vector <bool> traversed;
+vector<Point> B;
 int pN {};
 long long total {}, answer {};
 
 void dfs (int p) {
     traversed[p] = true;
-    for (int i = 0; i < A[p].size(); ++i) {
-        if(!traversed[A[p][i]]) {
-            dfs(A[p][i]);
+    for (int i = 0; i < B[p].A.size(); ++i) {
+        if(!traversed[B[p].A[i]]) {
+            dfs(B[p].A[i]);
         }
     }
-    processed.push_back(p);
+    S.push(p);
     return;
 }
-void reverseDfs (int p, long long  pp) {
+void reverseDfs (int p) {
     traversed[p] = true;
-    seq[p] = pp;
-    for (int i = 0; i < B[p].size(); ++i){
-        if(!traversed[B[p][i]]) {
-            reverseDfs(B[p][i], pp);
+    ++total;
+    for (int i = 0; i < B[p].revA.size(); ++i){
+        if(!traversed[B[p].revA[i]]) {
+            reverseDfs(B[p].revA[i]);
         }
     }
     return;
@@ -38,32 +43,31 @@ void kosaraju () {
         }
     }
     for (int i = 0; i <= pN; ++i) traversed[i] = false;
-    long long pp {};
-    for(int i = processed.size() - 1; i >= 0; --i) {
-        if (!traversed[seq[i]]) {
-            reverseDfs(seq[i], ++pp);
+    while (!S.empty()){
+        int i = S.top();
+        S.pop();
+        if (!traversed[i]) {
+            total = 0;
+            reverseDfs(i);
+            if (total >= 2)
+                answer += (total * (total - 1) / 2);
         }
     }
-    return pp;
+    return;
 }
 
 int main() {
     int readIn {};
     cin >> pN >> readIn;
     vector <int> temp(2, 0);
-    vector <int> tempp;
-    for(int i = 0; i <= pN; ++i){
-        A.push_back(tempp);
-        B.push_back(tempp);
-    }
+    B.resize(pN + 1);
     for(int i = 0; i < readIn; ++i){
         cin >> temp[0] >> temp[1];
-        A[temp[0]].push_back(temp[1]);
-        B[temp[1]].push_back(temp[0]);
+        B[temp[0]].A.push_back(temp[1]);
+        B[temp[1]].revA.push_back(temp[0]);
     }
     traversed.resize(pN + 1);
-    seq.resize(pN + 1);
-    answer = kosaraju();
+    kosaraju();
     cout << answer;
     return 0;
 }
