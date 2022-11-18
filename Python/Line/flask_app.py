@@ -36,6 +36,7 @@ def draw_barcode(decoded, image):
     return image
 
 data = []
+observe = []
 cata = [1, 0, 0, 0, 0, 0]
 item = {}
 temp = ''
@@ -82,6 +83,14 @@ def handle_message(event):
         user_command_dict[user_id] = '@價錢比較'
     elif user_command == '@價錢比較':
         reply_message = TextSendMessage(text='該產品為 御茶園!\n在LINE購物中有更低價格! 為23元')
+        user_command_dict[user_id] = None
+    elif user_message == '@觀察期追蹤' and user_command != '@觀察期追蹤':
+        reply_message = TextSendMessage(text='請輸入商品名稱')
+        user_command_dict[user_id] = '@觀察期追蹤'
+    elif user_command == '@觀察期追蹤':
+        temp = user_message
+        observe.append(user_message)
+        reply_message = TextSendMessage(text='已加入觀察期名單 !')
         user_command_dict[user_id] = None
     elif user_message == '@記帳' and user_command != '@記帳':
         reply_message = TextSendMessage(text='請輸入商品名稱')
