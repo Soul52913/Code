@@ -5,64 +5,37 @@
 
 using namespace std;
 
-struct City {
-    int city;
-    long long dist;
-};
-
-typedef pair <long long, int> node;
-vector <vector <City>> points;
 int N {}, M {};
 
-long long dijkstra() {
-	vector <long long> dist(N + 1, INT64_MAX);
-    priority_queue <node, vector <node>, greater <node>> pq;
-	dist[0] = 0, dist[1] = 0;
-    node tempp;
-    pq.push(make_pair(dist[1], 1));
-	while(pq.size()){
-		int index = pq.top().second;
-        pq.pop();
-		for (int j = 0; j < points[index].size(); ++j){
-            if ((dist[index] + points[index][j].dist) < dist[points[index][j].city] && index != points[index][j].city) {
-                dist[points[index][j].city] = dist[index] + points[index][j].dist;
-                pq.push(make_pair(dist[points[index][j].city], points[index][j].city));
-            }
-        }
-	}
-    long long total {};
-    for (int i = 2; i <= N; ++i){
-        total += dist[i];
-    }
-    return total;
-}
+struct Tree {
+    int parent;
+    long long c;
+    long long d;
+    vector <int> child;
+};
+
+vector <Tree> forest;
+vector <int> roots;
+vector <vector <int>> dp;
 
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
-	int temp {};
-    long long min {INT64_MAX};
     cin >> N >> M;
-    points.resize(N + 1);
-    City input;
-    input.city = -1, input.dist = -1;
+	forest.resize(N);
+    vector <int> temp (N, 0);
+    for (int i = 0; i <= M; ++i){
+        dp.push_back(temp);
+    }
+    Tree tree;
     for(int i = 0; i < M; ++i){
-        cin >> temp >> input.city >> input.dist;
-        points[temp].push_back(input);
+        cin >> forest[i].parent;
+        if (forest[i].parent == -1)
+            roots.push_back(i);
     }
-    long long tempp {};
-    if (N > 1){
-        for(int i = 2; i <= N; ++i){
-            input.city = i, input.dist = 0;
-            points[1].push_back(input);
-            tempp = dijkstra();
-            if (tempp < min) min = tempp;
-            points[1].pop_back();
-        }
-        cout << min;
+    for(int i = 0; i < M; ++i){
+        cin >> forest[i].c >> forest[i].d;
     }
-    else{
-        cout << 0;
-    }
+    
 	return 0;
 }
