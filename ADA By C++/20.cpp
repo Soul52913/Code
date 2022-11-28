@@ -24,10 +24,12 @@ vector <vector <long long>> dp;
 void dfs (int index) {
     long long totalC = forest[index].c;
     int totalNode = 1;
-    for (int i = 0; i < forest[index].child.size(); ++i){
-        dfs(forest[index].child[i]);
-        totalC += forest[forest[index].child[i]].subTreeC;
-        totalNode += forest[forest[index].child[i]].nodeNum;
+    if (!(forest[index].child.empty())){
+        for (int i = 0; i < forest[index].child.size(); ++i){
+            dfs(forest[index].child[i]);
+            totalC += forest[forest[index].child[i]].subTreeC;
+            totalNode += forest[forest[index].child[i]].nodeNum;
+        }
     }
     forest[index].subTreeC = totalC;
     forest[index].nodeNum = totalNode;
@@ -41,25 +43,27 @@ void dpING () {
         if(i >= forest[index].c || i >= forest[index].d)
             dp[index][i] = forest[index].c;
     }
-    for(int i = 1; i < seq.size(); ++i) {
-        int index = seq[i];
-        int prev = seq[i - 1];
-        for (int j = 0; j <= M; ++j) {
-            dp[index][j] = dp[prev][j];
-            long long left = 0;
-            if(j >= forest[index].c) {
-                left = j - forest[index].c;
-                if (forest[index].c + dp[prev][left] > dp[index][j]){
-                    dp[index][j] = forest[index].c + dp[prev][left];
+    if (seq.size() != 1){
+        for(int i = 1; i < seq.size(); ++i) {
+            int index = seq[i];
+            int prev = seq[i - 1];
+            for (int j = 0; j <= M; ++j) {
+                dp[index][j] = dp[prev][j];
+                long long left = 0;
+                if(j >= forest[index].c) {
+                    left = j - forest[index].c;
+                    if (forest[index].c + dp[prev][left] > dp[index][j]){
+                        dp[index][j] = forest[index].c + dp[prev][left];
+                    }
                 }
-            }
-            if(j >= forest[index].d) {
-                left = j - forest[index].d;
-                long long dpleft = 0;
-                if (i - forest[index].nodeNum >= 0)
-                    dpleft = dp[seq[i - forest[index].nodeNum]][left];
-                if (forest[index].subTreeC + dpleft > dp[index][j]){
-                    dp[index][j] = forest[index].subTreeC + dpleft;
+                if(j >= forest[index].d) {
+                    left = j - forest[index].d;
+                    long long dpleft = 0;
+                    if (i - forest[index].nodeNum >= 0)
+                        dpleft = dp[seq[i - forest[index].nodeNum]][left];
+                    if (forest[index].subTreeC + dpleft > dp[index][j]){
+                        dp[index][j] = forest[index].subTreeC + dpleft;
+                    }
                 }
             }
         }
@@ -70,32 +74,38 @@ void dpING () {
 int main() {
     //ios_base::sync_with_stdio(0);
     //cin.tie(0);
+    forest.clear();
+    roots.clear();
+    seq.clear();
+    dp.clear();
     cin >> N >> M;
     forest.resize(N);
     vector <long long> temp (M + 1, 0);
     for (int i = 0; i < N; ++i)
         dp.push_back(temp);
-    for(int i = 0; i < M; ++i){
+    for(int i = 0; i < N; ++i){
         cin >> forest[i].parent;
         if (forest[i].parent == -1)
             roots.push_back(i);
         else
             forest[forest[i].parent].child.push_back(i);
     }
-    for(int i = 0; i < M; ++i){
+    for(int i = 0; i < N; ++i){
         cin >> forest[i].c >> forest[i].d;
     }
-    for (int i = 0; i < roots.size(); ++i){
-        dfs(roots[i]);
+    if (!(roots.empty())){
+        for (int i = 0; i < roots.size(); ++i){
+            dfs(roots[i]);
+        }
     }
     dpING();
     //for (auto next : forest) cout << next.nodeNum;
-    for(int i = 0; i < seq.size(); ++i){
+    /*for(int i = 0; i < seq.size(); ++i){
         int index = seq[i];
         for(int j = 0; j <= M; ++j){
             cout << dp[index][j] << " ";
         }cout << endl;
-    }
-    cout << dp[seq[(seq.size() - 1)]][M];
+    }*/
+    cout << dp[seq.back()][M];
 	return 0;
 }
