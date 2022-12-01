@@ -4,7 +4,8 @@
 ## 2 reference Myself
 ## 3 reference Myself
 ## 4 reference Myself
-## 5 reference Myself
+## 5 reference 
+### (f), (g) :https://www.geeksforgeeks.org/find-longest-path-directed-acyclic-graph/
 ## 6 reference Myself
 ## 5
 ### (a)
@@ -37,8 +38,30 @@ Let n be the minimum index in a point-cycle, n > 0 and k be the length of the po
 Total : O(N) + O(N) + O(N) + O(N) = O(N)
 Find answer: O(1) //search ans[i]
 ### (f) & (g)
-
-
+#### Algorithm
+1. Use Kosaraju’s algorithm to find all SCC, set the max length of these point of SCC to INF. Find SCC means we found cycle, according to the description, the length of cycle is INF.
+2. There will be three kinds of nodes. First one is the node have longest distance. Second is the node that point to a node have largest length. Third one is the node that doesn't meet the condition of first and second one. Since first one has already had the answer, so we skip it. 
+3. For second case node, pick the max length of the longest path from its out-degree and plus one. This is the answer of the node. Then, we do it until only third case node left. 
+4. Then, for the third case node randomly choose a node K. Create a dist[ ] to store the distance that the node K pass another node. Find longest distance by :
+    1. Create a topological order of all vertices that the node K will pass 
+    2. Do following for every vertex u in topological order. 
+    3. Do following for every adjacent vertex v of u 
+    4. if (dist[v] < dist[u] + length(u, v)) 
+    5. dist[v] = dist[u] + length(u, v)<br>
+5. Then, we find the largest distance for the node K and go repeatly do 3. and 4. until all node have largest distance.<br>
+Notice that when we find the longest distance, we put this node into first case and the node next to it to second case.
+#### Explain
+1. For step 1, we use Kosaraju’s algorithm to find SCC first to deal with loop first.
+2. For step 2, we spilt all possible condition into three catagories to deal with them one by one.
+3. For step 3, because all possible reach distance all add one, choose the longest path from its out-degree must get longesst distance.
+4. For step 4, we change Dijkstra’s algorithm into finding longest path for a node K to let the node next to it can use step 3 to get the answer.<br>
+Thus, we can get the longest distance of all nodes.
+#### Time Complexity
+1. Kosaraju’s algorithm: O(V+E) 
+2. O(V) since there is only V node
+3. O(E) since there is only E edge need to consider
+4. Because the third case only appears when a graph is disjoint to another and there is only V node, we only do this in total V+E. Dijkstra’s algorithm: O(V+E)<br>
+Total: O(V+E)+O(V)+O(E)+O(V+E) = O(V+E)
 ## 6
 ### (a)
 ##### algorithm:
@@ -91,12 +114,36 @@ stack[] to store our stack
 2. Per-op amortized costs for PUT is O(k) and TAKE, CC is O(1), so total cost is o(kM) < o( $ Mk^{1.1101420} $)
 #### (b)
 ##### Potential method
-1. Guess $ Φ(T_i) $ , where T.sum is the number of inserted objects and T.size is the table size
+1. Guess $ Φ(T_i) = \frac{3+\sqrt{5}}{2}*T(i).sum-\frac{1+\sqrt{5}}{2}*T(i).size $ , where T(i).sum is the number of inserted objects and T(i).size is the table size with i-th op
 2. Validity check:
-    1. Φ($ T_0 $) = 0, because T.sum and T.size is initially 0
-    2. Φ($ T_i $) ≥ 0, because T.size must $ \geq$ T.sum to put thing s into the table 
+    1. Φ($ T_0 $) = 0, because T(0).sum and T(0).size is initially 0
+    2. Φ($ T_i $) ≥ 0, because T(i).size must $ \geq$ T(i).sum to put thing s into the table 
 3. Compute the amortized cost of INCREMENT:
-    1. Let $ F_j $ is the j-th Fibonacci number. By the speciality of Fibonacci sequence, we know that $ (F_n * \phi(\approx1.618))\approx F_{n+1} $
-    2. For example, $ F_3 $ = 2, and $ F_7 $ = 13
-    3. $ C_i = c_i + Φ(T_i) − Φ(T_{i-1}) = F_n - (F_{n-1} - 1) \approx F_{n-1} * \phi - F_{n-1} + 1 = \phi$ is Constant
-4. All operations have O(1) amortized cost, so the total cost of n operations is O(n)
+    1. Insertion without resize<br>
+    actual cost: 1 (insert) <br>
+    T(i).size is same, T(i).sum = T.sum + 1<br>
+    $ C_i = \frac{3+\sqrt{5}}{2}*(1)-\frac{1+\sqrt{5}}{2}*(0) + 1 = \frac{5+\sqrt{5}}{2} $
+    2. Insertion without resize<br>
+    actual cost: $ F_{n-1} + 1$ (copy and insert) <br>
+    T(i).size = T(i-1).size + $ F_n-H_{n-1} $ is same, T(i).sum = T.sum + 1<br>
+    $ C_i = \frac{3+\sqrt{5}}{2}*(1)-\frac{1+\sqrt{5}}{2}*(F_n-F_{n-1}) + F_{n-1} + 1 = \frac{3+\sqrt{5}}{2}*(1)-\frac{1+\sqrt{5}}{2}*(F_{n-2}) + F_{n-1} + 1 \approx \frac{5+\sqrt{5}}{2} + F_{n-1} - F{n-1} = \frac{5+\sqrt{5}}{2}$
+4. All operations have $ \frac{5+\sqrt{5}}{2}$= O(1) amortized cost, so the total cost of n operations is O(n)
+#### (c)
+##### algorithm:
+1. When we get $ (l_i, r_i, c_i) $, find the node j that j.r $ \geq r_i $, copy the value of it as (j.l, j.r, j.c) and delete it from the tree.
+2. Find the node k that k.l $ \leq l_i $, copy the value of it as (k.l, k.r, k.c) and delete it from the tree.
+3. Take out the node between j and k, and delete them from the tree.
+4. Create three node, first is the left node with (k.l, $ l_i-1 $, k.c), middle node with $ (l_i, r_i, c_i) $, and right node with ($ r_i+1 $, j.r, j.c)
+5. Push these three node into the balanced binary search tree.
+##### Explain:
+For step 1, 2, and 3, we are modifying the node into the pattern we want. We find that if the nodes between j and k is very large the time complexity may exceed O(logN), but if we think carefully, we find that after the operation we will delete (k - j + 1 - 3) nodes. Thus, the number of node need to remove at later operation will cost last. We can think this with amortized analysis. In the end, we will get the time complexity as below. 
+##### Time complexity:
+To search node: O(logN)
+#### (d)
+Since for each u belongs to child(v) and for each v belongs to child(v). By the question, when u and v, $ x.w* y.w$ will be add to sum. But when the value of u and v is swap and the value of x and y swap again, $ x.w* y.w$ will be add to the sum again.<br>
+Thus, a pair (x, y) will be found twice. So, total multiplication will be 
+2*C{V取2}=V*(V-1)  <br>
+Total time complexity after running Algorithm 1 on all vertices is O( $ V^2 $ )<br>
+Thus, for each node, the amortized time complexity is $ \frac{O(V^2)}{V} = O(V) $
+
+
