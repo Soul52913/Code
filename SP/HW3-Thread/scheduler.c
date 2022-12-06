@@ -7,6 +7,10 @@
  */
 void sighandler(int signo) {
     // TODO
+    if (setjmp(sched_buf) == 0){
+        
+    }
+    if( sigismember( &set , SIGQUIT ) )
 }
 
 /*

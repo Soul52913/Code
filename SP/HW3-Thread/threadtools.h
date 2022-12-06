@@ -42,25 +42,37 @@ void scheduler();
 }
 
 #define thread_setup(id, arg) {\
-    ready_queue[rq_current]->id = id, ready_queue[rq_current]->arg = arg;\
-    ready_queue[rq_current]->i = 0, ready_queue[rq_current]->x = 0, ready_queue[rq_current]->y = 0;\
-    sprintf(ready_queue[rq_current]->buf, "%d_%s", id, __FUNCTION__);\
-    mkfifo(ready_queue[rq_current]->buf, 0700);\
-    ready_queue[rq_current]->fd = open(ready_queue[rq_current]->buf, O_RD);
-    if (setjmp(ready_queue[rq_current]->environment) == 0){\
-        ++rq_size;
-        ++rq_current;
+    RUNNING->id = id, RUNNING->arg = arg;\
+    RUNNING->i = 0, RUNNING->x = 0, RUNNING->y = 0;\
+    sprintf(RUNNING->buf, "%d_%s", id, __FUNCTION__);\
+    mkfifo(RUNNING->buf, 0700);\
+    RUNNING->fd = open(RUNNING->buf, O_RDONLY);\
+    if (setjmp(RUNNING->environment) == 0){\
+        ++rq_size;\
+        ++rq_current;\
         fprintf(stderr, "Initialize");\
-    }
+    }\
 }
 
 #define thread_exit() {\
+    sprintf(RUNNING->buf, "%d_%s.fifo", id, __FUNCTION__);\
+    unlink(RUNNING->buf);\
+    longjmp(sched_buf, 3);\
 }
 
 #define thread_yield() {\
+    if (setjmp(RUNNING->environment) == 0){\
+        sigpromask(alrm_mask);\
+        sigpromask(tstp_mask);\
+        sigpromask(base_mask);\
+    }\
 }
 
 #define async_read(count) ({\
+    if (setjmp(RUNNING->environment) == 0){\
+        longjmp(sched_buf, 2);\
+    }\
+    read(RUNNING->fd, RUNNING->buf, count);\
 })
 
 #endif // THREADTOOL
