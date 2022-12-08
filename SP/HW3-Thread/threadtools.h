@@ -2,6 +2,15 @@
 #define THREADTOOL
 #include <setjmp.h>
 #include <sys/signal.h>
+#include <stdio.h>
+#include <poll.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 
 #define THREAD_MAX 16  // maximum number of threads created
 #define BUF_SIZE 512
@@ -42,37 +51,37 @@ void scheduler();
 }
 
 #define thread_setup(id, arg) {\
-    RUNNING->id = id, RUNNING->arg = arg;\
-    RUNNING->i = 0, RUNNING->x = 0, RUNNING->y = 0;\
+    ready_queue[rq_size] = malloc(sizeof(struct tcb));\
+    ready_queue[rq_size]->id = id, ready_queue[rq_size]->arg = arg;\
+    ready_queue[rq_size]->i = 0, ready_queue[rq_size]->x = 0, ready_queue[rq_size]->y = 0;\
     sprintf(RUNNING->buf, "%d_%s", id, __FUNCTION__);\
     mkfifo(RUNNING->buf, 0700);\
-    RUNNING->fd = open(RUNNING->buf, O_RDONLY);\
-    if (setjmp(RUNNING->environment) == 0){\
-        ++rq_size;\
-        ++rq_current;\
-        fprintf(stderr, "Initialize");\
+    RUNNING->fd = open(RUNNING->buf, O_RDWR | O_NONBLOCK);\
+    if (sigsetjmp(RUNNING->environment, 1) == 0){\
+        return;\
     }\
 }
 
 #define thread_exit() {\
-    sprintf(RUNNING->buf, "%d_%s.fifo", id, __FUNCTION__);\
+    sprintf(RUNNING->buf, "%d_%s", id, __FUNCTION__);\
     unlink(RUNNING->buf);\
     longjmp(sched_buf, 3);\
 }
 
 #define thread_yield() {\
-    if (setjmp(RUNNING->environment) == 0){\
-        sigpromask(alrm_mask);\
-        sigpromask(tstp_mask);\
-        sigpromask(base_mask);\
+    if (sigsetjmp(RUNNING->environment, 1) == 0){\
+        sigprocmask(SIG_SETMASK, &alrm_mask, NULL);\
+        sigprocmask(SIG_SETMASK, &tstp_mask, NULL);\
+        sigprocmask(SIG_SETMASK, &base_mask, NULL);\
     }\
 }
 
 #define async_read(count) ({\
-    if (setjmp(RUNNING->environment) == 0){\
-        longjmp(sched_buf, 2);\
+    if (sigsetjmp(RUNNING->environment, 1) == 0){\
+        siglongjmp(sched_buf, 2);\
     }\
-    read(RUNNING->fd, RUNNING->buf, count);\
+    else\
+        read(RUNNING->fd, RUNNING->buf, count);\
 })
 
 #endif // THREADTOOL

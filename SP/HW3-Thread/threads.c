@@ -29,15 +29,15 @@ void collatz(int id, int arg) {
     thread_setup(id, arg);
 
     for (RUNNING->i = 1; ; ){
-        if (arg % 2 == 1){
-            arg = arg * 3 + 1
+        if (RUNNING->arg % 2 == 1){
+            RUNNING->arg = RUNNING->arg * 3 + 1;
         }
         else {
-            arg = arg / 2;
+            RUNNING->arg = RUNNING->arg / 2;
         }
-        printf("%d %d", RUNNING->id, arg);
+        printf("%d %d\n", RUNNING->id, RUNNING->arg);
         sleep(1);
-        if (arg == 1) {
+        if (RUNNING->arg == 1) {
             thread_exit();
         }
         else {
@@ -47,33 +47,26 @@ void collatz(int id, int arg) {
 }
 
 void max_subarray(int id, int arg) {
-    if (arg > 0) {
-        read(RUNNING->fd, RUNNING->buf, N * 6);
-        int temp[arg];
-        for(RUNNING->i = 0; RUNNING->i < N; ++RUNNING->i){
-            sscanf(RUNNING->buf, "%d", &temp[RUNNING->i]);
-        }
-        int tempp = temp[0];
-        int Max = temp[0];
-        printf("%d %d", RUNNING->id, Max);
-        thread_yield();
-        sleep(1);
-        for (RUNNING->i = 0; RUNNING->i < N; ++RUNNING->i) {
-            if (temp[RUNNING->i] >= temp[RUNNING->i] + tempp)
-                tempp = temp[RUNNING->i];
+    thread_setup(id, arg);
+    if (RUNNING->arg > 0) {
+        for (RUNNING->i = 0; RUNNING->i < RUNNING->arg; ++RUNNING->i) {
+            async_read(5);
+            int temp = atoi(RUNNING->buf);
+            if (RUNNING->y + temp > temp)
+                RUNNING->y += temp;
             else
-                tempp = temp[RUNNING->i] + tempp;
-            if (tempp > Max)
-                Max = tempp;
-            printf("%d %d", RUNNING->id, Max);
-            sleep(1);
-            thread_yield();
+                RUNNING->y = temp;
+            if (RUNNING->y > RUNNING->x)
+                RUNNING->x = RUNNING->y;
+            printf("%d %d\n", RUNNING->id, RUNNING->x);
+            if(RUNNING->i != (RUNNING->arg - 1)){
+                sleep(1);
+                thread_yield();
+            }
         }
     }
     else {
-        printf("%d %d", RUNNING->id, 0);
-        sleep(1);
-        thread_yield();
+        printf("%d %d\n", RUNNING->id, 0);
     }
     sleep(1);
     thread_exit();
