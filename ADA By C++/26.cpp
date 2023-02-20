@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "ypglpk.hpp"
 using namespace std;
 
 struct Edge {
@@ -16,9 +17,9 @@ int main() {
 	int temp {};
     cin >> N >> M;
     Edges.resize(M);
-    vector <vector <long long>> matrix;
+    vector <vector <double>> matrix;
     matrix.resize(M + 3 * N);
-    vector <long long> row;
+    vector <double> row;
     row.resize(N + M);
     for (int i = 0; i < M + 3 * N; ++i) {
         matrix.push_back(row);
@@ -28,10 +29,10 @@ int main() {
         cin >> input.start >> input.end >> input.dist;
         Edges.push_back(input);
     }
-    vector <long long> out;
+    vector <double> out;
     out.resize(M + 3 * N);
 	for (int i = 0; i < M; ++i) {
-        int start = Edges[i].start, end = Edges[i].end;
+        double start = Edges[i].start, end = Edges[i].end;
         matrix[start - 1][i] = -1;
         matrix[end - 1][i] = 1;
         matrix[start - 1 + N][i] = 1;
@@ -56,6 +57,25 @@ int main() {
             out[start - 1 + N] = 0;
             out[start - 1 + N * 2] = 1;
         }
+    }
+    vector <double> var;
+    var.resize(M + N, 0);
+    for (int i = 0; i < M; ++i) {
+        var[i] = 1;
+    }
+    out.resize(M + 3 * N);
+    pair<double, vector<double>> res;
+    res = ypglpk::linear_programming(matrix, out, var);
+    int total = 0;
+    for (int i = 0; i < M; ++i) {
+        if (res.second[i])
+            ++total;
+    }
+    if (total != M) {
+        cout << -1;
+    }
+    else {
+        cout << res.first;
     }
 	return 0;
 }
